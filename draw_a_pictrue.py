@@ -5,12 +5,12 @@ from matplotlib import pyplot as plt
 
 plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.figure(figsize=(2, 3))
-labels = [u'分类', u'聚类', u'关联规则']
+labels = [u'分类', u'聚类', u'关联规则', u'分类', u'聚类', u'关联规则']
 
-sizes = [17.24, 10.34, 13.80]
-colors = ['red', 'yellow', 'blue']
+sizes = [13.79, 6.90, 37.93, 17.24, 10.34, 13.80]
+colors = ['pink', 'yellow', 'lightskyblue', 'lime', 'red', 'cyan']
 
-explode = (0, 0, 0)
+explode = (0, 0, 0, 0, 0, 0)
 
 patches, l_text, p_text = plt.pie(sizes, explode=explode, labels=labels, colors=colors,
                                   labeldistance=0.4, autopct='%4.2f%%', shadow=False,
