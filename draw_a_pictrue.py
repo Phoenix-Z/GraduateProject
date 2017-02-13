@@ -1,5 +1,5 @@
 # coding:utf-8
-# 这段代码用来
+# 这段代码用来画饼状图。
 from matplotlib import pyplot as plt
 
 
