@@ -2,6 +2,12 @@
 import requests
 import re
 import CopeWithJS
+import win32clipboard
+import sys
+
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 
 def translate(text):
@@ -34,14 +40,17 @@ def translate(text):
         i += 1
     return result
 
+
+def delete_rn(text):
+    return text.replace('\r\n', ' ')
+
 if __name__ == "__main__":
-    # text_1 原文
-    # text_1=open('c:\\text.txt','r').read()
-    text_list = ['Hello, my name is Derek. Nice to meet you! ', 'hello world. Try again',
-                 'How are you? Fine, Thank you. And you ?']
-    for text_1 in text_list:
-        print 'The input text: %s' % text_1
-
-        text_2 = translate(text_1)
-        print 'The output text: %s' % text_2
-
+    win32clipboard.OpenClipboard()
+    source = win32clipboard.GetClipboardData()
+    win32clipboard.CloseClipboard()
+    source = delete_rn(source).decode('gbk')
+    with open("output.txt", 'a') as f:
+        output = translate(source)
+        f.write(output)
+        f.write("\r\n")
+    print "done!"
