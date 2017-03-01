@@ -2,6 +2,8 @@
 import execjs
 
 
+# 计算tk的方法来自于https://github.com/cocoa520/Google_TK
+# 这里使用了PyExecJS模块来在Python中调用Javascript的代码
 def get_tk(text):
     js_handler = execjs.compile("""
     function TL(a) {
