@@ -89,18 +89,17 @@ public class Party extends Thread {
 		// 初始化聚类中心
 		init();
 		float[][] prev = new float[clusterNum][];
-		//int times = 0;
 		do {
 			for (int i = 0; i < clusterNum; i++) {
 				prev[i] = Arrays.copyOf(centers[i], attributes);
 			}
-			System.out.println(Arrays.deepToString(centers));
+			//System.out.println("I'm party" + this.id + Arrays.deepToString(centers));
 			// 计算每一个元组与之最近的聚类的聚类编号
 			Map<Integer, List<Integer>> entityBelongCluster = new HashMap<>();
 			for (int i = 0; i < entities; i++) {
-				System.out.println("another run: " + i);
+				//System.out.println("another run: " + i);
 				int clusterId = closestCluster(i);
-				System.out.println("cluster id is " + clusterId);
+				//System.out.println("cluster id is " + clusterId);
 				// 重置
 				synchronized (done) {
 					done.add(this.id);
@@ -118,7 +117,7 @@ public class Party extends Thread {
 						done.notifyAll();
 					}
 				}
-				System.out.println("Party" + this.id + " is running." + "This is " + i + " entity.");
+				//System.out.println("Party" + this.id + " is running." + "This is " + i + " entity.");
 				List<Integer> old = null;
 				if (entityBelongCluster.containsKey(clusterId)) {
 					old = entityBelongCluster.get(clusterId);
@@ -134,13 +133,12 @@ public class Party extends Thread {
 				recalculateCenters(centers, entry.getKey(), entry.getValue());
 			}
 
-			System.out.println("I'm party" + this.id + ".My centers are " + Arrays.deepToString(centers));
-			//times++;
-		} while (isSatisfyCriteria(prev, centers));
+		} while (!isSatisfyCriteria(prev, centers));
+		System.out.println("I'm party" + this.id + ".My centers are " + Arrays.deepToString(centers));
 	}
 
 	public void init() {
-		Random random = new Random(47);
+		Random random = new Random();
 		for (int i = 0; i < attributes; i++) {
 			float min = Float.MAX_VALUE, max = Float.MIN_NORMAL;
 			for (int j = 0; j < entities; j++) {
@@ -158,7 +156,7 @@ public class Party extends Thread {
 	}
 
 	public boolean isSatisfyCriteria(float[][] prev, float[][] now) {
-		float threshold = 10e-2f;
+		float threshold = 10e-7f;
 		for (int i = 0; i < prev.length; i++) {
 			for (int j = 0; j < prev[i].length; j++) {
 				if (Math.abs(prev[i][j] - now[i][j]) > threshold)
@@ -196,8 +194,9 @@ public class Party extends Thread {
 						e.printStackTrace();
 						randomData.notifyAll();
 					}
+				} else{
+					randomData.notifyAll();
 				}
-				randomData.notifyAll();
 			}
 
 			// 计算本地秘密
@@ -224,20 +223,21 @@ public class Party extends Thread {
 						e.printStackTrace();
 						done.notifyAll();
 					}
+				} else {
+					done.clear();
+					randomData.clear();
+					done.notifyAll();
 				}
-				done.clear();
-				randomData.clear();
-				done.notifyAll();
 			}
-			//System.out.println("I'm out");
 		}
+		//System.out.println("I'm out");
 		
 		//System.out.println("Phase one is okay. I'm Party" + this.id);
 
 		// 第2个数据库到第r-1个数据库将数据发送给第r个数据库
-		if (this.id != 1) {
+//		if (this.id != 1) {
 			synchronized (sumT) {
-				if (this.id == databases && sumT.size() < (databases - 2)) {
+				if (this.id == databases && sumT.size() < (databases - 1)) {
 					try {
 						sumT.wait();
 					} catch (InterruptedException e) {
@@ -246,11 +246,11 @@ public class Party extends Thread {
 					}
 				}
 				sumT.add(T);
-				if (sumT.size() == (databases - 2)) {
+				if (sumT.size() == (databases - 1)) {
 					sumT.notifyAll();
 				}
 			}
-		}
+//		}
 		
 		//System.out.println("Phase two is okay. I'm Party" + this.id);
 		// 第r个数据库计算更新后的数据
@@ -260,7 +260,10 @@ public class Party extends Thread {
 					T[j] += sumT.get(i)[j];
 				}
 			}
-			System.out.println("I'm Party" + this.id + ".T is" + Arrays.toString(T));
+			synchronized (sumT) {
+				sumT.clear();
+			}
+			//System.out.println("I'm Party" + this.id + ".T is" + Arrays.toString(T));
 		}
 		
 		
@@ -278,7 +281,7 @@ public class Party extends Thread {
 		}
 		
 		if(this.id == 1) {
-			System.out.println("I'm Party" + this.id + ". T is " + Arrays.toString(T));
+			//System.out.println("I'm Party" + this.id + ". T is " + Arrays.toString(T));
 			//System.out.println("now's result is" + result);
 			result = 0;
 			for(int i = 1; i < clusterNum; i++) {
@@ -291,16 +294,16 @@ public class Party extends Thread {
 				synchronized (tunnel) {
 					if(tunnel.size() < 1) {
 						try {
-							System.out.println("I'm waiting");
+//							System.out.println("I'm waiting");
 							tunnel.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 							tunnel.notify();
 						}
 					}
-					System.out.println("I'm awaking:" + tunnel.get(0));
+//					System.out.println("I'm awaking:" + tunnel.get(0));
 					right = tunnel.remove(0);
-					System.out.println("left is " + left + " right is " +right);
+//					System.out.println("left is " + left + " right is " +right);
 				}
 				if(left > right) {
 					result = i;
@@ -327,7 +330,7 @@ public class Party extends Thread {
 					}
 					minIndex = now.remove(0);
 				}
-				System.out.println("minIndex is " + minIndex);
+//				System.out.println("minIndex is " + minIndex);
 				float right = T[i] - T[minIndex];
 				synchronized (tunnel) {
 					tunnel.add(right);
@@ -346,12 +349,12 @@ public class Party extends Thread {
 				}
 			}
 		}
-		System.out.println("I'm party" + this.id + ". And result is " + result);
+//		System.out.println("I'm party" + this.id + ". And result is " + result);
 		return result;
 	}
 
 	public void recalculateCenters(float[][] centers, int clusterId, List<Integer> entities) {
-		System.out.println("cluster id is " + clusterId);
+		//System.out.println("cluster id is " + clusterId);
 		for (int i = 0; i < this.attributes; i++) {
 			float sum = 0;
 			for (int entityId : entities) {
@@ -366,8 +369,8 @@ public class Party extends Thread {
 	}
 
 	public static void main(String[] args) {
-		float[][] d1 = {{1f},{1.2f},{100.1f},{99.9f}};
-		float[][] d2 = {{0.9f},{1.1f},{100.2f},{99.8f}};
+		float[][] d1 = {{1f},{1.2f},{100.1f},{99.9f},{0.5f}};
+		float[][] d2 = {{0.9f},{1.1f},{100.2f},{99.8f},{0.7f}};
 		Party party1 = new Party(1, 2, d1);
 		Party party2 = new Party(2, 2, d2);
 		party1.start();
