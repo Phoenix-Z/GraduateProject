@@ -1,4 +1,4 @@
-package phaseOne;
+package phaseOne.cluster;
 
 import java.util.ArrayList;
 import java.util.Arrays;
