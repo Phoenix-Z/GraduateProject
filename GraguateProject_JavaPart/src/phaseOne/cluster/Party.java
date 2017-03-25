@@ -156,7 +156,7 @@ public class Party extends Thread {
 	}
 
 	public boolean isSatisfyCriteria(float[][] prev, float[][] now) {
-		float threshold = 10e-7f;
+		float threshold = 10e-10f;
 		for (int i = 0; i < prev.length; i++) {
 			for (int j = 0; j < prev[i].length; j++) {
 				if (Math.abs(prev[i][j] - now[i][j]) > threshold)
@@ -369,12 +369,40 @@ public class Party extends Thread {
 	}
 
 	public static void main(String[] args) {
-		float[][] d1 = {{1f},{1.2f},{100.1f},{99.9f},{0.5f}};
-		float[][] d2 = {{0.9f},{1.1f},{100.2f},{99.8f},{0.7f}};
-		Party party1 = new Party(1, 2, d1);
-		Party party2 = new Party(2, 2, d2);
+		List<float[]> datas = GetData.getData();
+		int length = datas.size();
+		float[][] d1 = new float[length][];
+		float[][] d2 = new float[length][];
+		float[][] d3 = new float[length][];
+		float[][] d4 = new float[length][];
+		for(int i = 0; i < length; i++) {
+			int j = 0;
+			d1[i] = new float[3];
+			for(int k = 0; k < 3; k++) {
+				d1[i][k] = datas.get(i)[j++];
+			}
+			d2[i] = new float[3];
+			for(int k = 0; k < 3; k++) {
+				d2[i][k] = datas.get(i)[j++];
+			}
+			d3[i] = new float[3];
+			for(int k = 0; k < 3; k++) {
+				d3[i][k] = datas.get(i)[j++];
+			}
+			d4[i] = new float[4];
+			for(int k = 0; k < 4; k++) {
+				d4[i][k] = datas.get(i)[j++];
+			}
+		}
+		
+		Party party1 = new Party(1, 3, d1);
+		Party party2 = new Party(2, 3, d2);
+		Party party3 = new Party(3, 3, d3);
+		Party party4 = new Party(4, 3, d4);
 		party1.start();
 		party2.start();
+		party3.start();
+		party4.start();
 /*		try {
 			sleep(100);
 		} catch (InterruptedException e) {
