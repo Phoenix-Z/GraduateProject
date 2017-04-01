@@ -17,10 +17,25 @@ public class TreeNode {
 	private ArrayList<ArrayList<String>> datas; 
 	private ArrayList<String> candicateAttr;
 	
+
+	@Override
+	public String toString() {
+		return "TreeNode [featrue=" + featrue + ", rules=" + rules + ", kids=" + kids + "]";
+	}
+
+	
 	public TreeNode() {
 		this.featrue = "";
 		this.rules = new ArrayList<>();
 		this.kids = new ArrayList<>();
+		this.datas = null;
+		this.candicateAttr = null;
+	}
+
+	public TreeNode(String featrue) {
+		this.featrue = featrue;
+		this.rules = null;
+		this.kids = null;
 		this.datas = null;
 		this.candicateAttr = null;
 	}
