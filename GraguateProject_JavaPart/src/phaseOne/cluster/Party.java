@@ -58,6 +58,7 @@ public class Party extends Thread {
 	static List<Float> tunnel = new ArrayList<>();
 	static List<Integer> now = new ArrayList<>();
 	static List<Integer> done = new ArrayList<>();
+	static int iterateTimes = 0;
 
 	public Party(int id, float[][] data) {
 		this.id = id;
@@ -132,9 +133,10 @@ public class Party extends Thread {
 			for (Map.Entry<Integer, List<Integer>> entry : entityBelongCluster.entrySet()) {
 				recalculateCenters(centers, entry.getKey(), entry.getValue());
 			}
-
+			iterateTimes++;
 		} while (!isSatisfyCriteria(prev, centers));
 		System.out.println("I'm party" + this.id + ".My centers are " + Arrays.deepToString(centers));
+		System.out.println("iterate times is: " + iterateTimes);
 	}
 
 	public void init() {
@@ -403,6 +405,7 @@ public class Party extends Thread {
 		party2.start();
 		party3.start();
 		party4.start();
+		//System.out.println(iterateTimes);
 /*		try {
 			sleep(100);
 		} catch (InterruptedException e) {
