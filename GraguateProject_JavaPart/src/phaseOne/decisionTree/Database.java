@@ -1,7 +1,6 @@
 package phaseOne.decisionTree;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -150,13 +149,13 @@ public class Database extends Thread {
 			group[i] = i;
 		do {
 			Tuple tuple = chooseBestFeature(group);
-			System.out.println(tuple);
+//			System.out.println(tuple);
 			synchronized (candidate) {
 				candidate.put(this.id, tuple);
 				if (candidate.size() == databases)
 					candidate.notifyAll();
 			}
-
+//			System.out.println("I'm database" + this.id + ". I'm running!");
 			synchronized (TrustedThirdParty.message) {
 				if (!TrustedThirdParty.message.containsKey(this.id)) {
 					try {
@@ -166,7 +165,7 @@ public class Database extends Thread {
 						TrustedThirdParty.message.notifyAll();
 					}
 					List<Integer> newGroup = TrustedThirdParty.message.remove(this.id);
-					System.out.println("I'm database" + this.id + " new group is:" + newGroup);
+//					 System.out.println("I'm database" + this.id + " new group is:" + newGroup);
 					if (newGroup == null) {
 						group = null;
 					} else {
@@ -189,7 +188,7 @@ public class Database extends Thread {
 					}
 				}
 			}
-			System.out.println("I'm database" + this.id + ", I use " + Arrays.toString(used));
+//			 System.out.println("I'm database" + this.id + ", I use " + Arrays.toString(used));
 		} while (group != null);
 	}
 }

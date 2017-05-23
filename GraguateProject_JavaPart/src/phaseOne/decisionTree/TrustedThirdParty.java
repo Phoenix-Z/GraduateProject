@@ -10,13 +10,24 @@ import java.util.Map;
 public class TrustedThirdParty extends Thread {
 
 	public static Map<Integer, List<Integer>> message = new HashMap<>();
+	private Class testClass;
 
+	public TrustedThirdParty(Class clazz) {
+		testClass = clazz;
+	}
+	
 	@Override
 	public void run() {
 		
 		TreeNode root = new TreeNode();
 		root = constructTree(root);
 		System.out.println(root);
+		// System.out.println("运行时间：" + (System.currentTimeMillis() - TestOneDatabase.startTime) * 0.001 + "秒");
+		try {
+			System.out.println("运行时间：" + (System.currentTimeMillis() - testClass.getField("startTime").getLong(testClass)) * 0.001 + "秒");
+		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+			e.printStackTrace();
+		}
 		synchronized (message) {
 			for(int i = 1; i <= Database.databases; i++) {
 				message.put(i, null);
@@ -39,10 +50,14 @@ public class TrustedThirdParty extends Thread {
 				Database.candidate.clear();
 			}
 		}
-		System.out.println(tuples);
+//		 System.out.println(tuples);
 		// 如果样本已不再可分(或者已不再有候选属性)，则返回一个叶子节点，叶子对应的属性就是决策变量的值
+		
 		if(isLeaf(tuples)){
-			return new TreeNode(tuples.get(0).feature);
+			if(tuples.size() != 0)
+				return new TreeNode(tuples.get(0).feature);
+			else
+				return new TreeNode();
 		}
 	
 		// 对tuples排序，以便找到信息增益最大的属性
