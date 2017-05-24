@@ -63,7 +63,7 @@ public class PartyWithPaillier extends Thread {
 	static List<BigInteger> tunnel = new ArrayList<>();
 	static List<Integer> now = new ArrayList<>();
 	static List<Integer> done = new ArrayList<>();
-	static Paillier compare = new Paillier(32, 32);
+	static Paillier compare = new Paillier(512, 16);
 	static List<BigInteger> cipher = new ArrayList<>();
 	static int iterateTimes = 0;
 

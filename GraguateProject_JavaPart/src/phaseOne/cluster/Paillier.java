@@ -36,6 +36,7 @@ public class Paillier {
 		KeyGeneration(512, 64);
 	}
 	
+	@SuppressWarnings("unused")
 	private BigInteger functionL(BigInteger u, BigInteger n) {
 		return u.subtract(BigInteger.ONE).divide(n);
 	}

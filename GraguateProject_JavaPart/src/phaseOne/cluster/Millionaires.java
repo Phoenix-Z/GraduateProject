@@ -4,8 +4,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * 本代码处理int型或者float型的数字，这些数字会被转换成32bit的二进制形式。
+ * 这里没有使用论文中提到的两个半可信第三方，而是采用如下的方式：
+ * Party X将cx发送给Party Y， 而将rx保留在本地，对于Party Y也是如此，将cy发送给Party X， 将ry保留在本地。
+ * @author Phoenix-Z
+ *
+ */
 public class Millionaires extends Thread {
 	
+	/**
+	 * @param name 百万富翁的名字， 假设两个百万富翁的名字是Alice和Bob
+	 * @param num 百万富翁的数字
+	 * @param lambda 对应于论文中的lambda
+	 * @param queue 多个线程共享的静态资源，用于传递密文
+	 * @param anotherQueue 多个线程共享的静态资源，用于传递GT1和GT2
+	 */
 	private String name = null;
 	private Integer num = null;
 	private int lambda = 50;
@@ -41,9 +55,11 @@ public class Millionaires extends Thread {
 		// xr的第二行是随机数
 		byte[][] xr = init(num);
 		byte[] cs = new byte[32];
+		// 生成异或值
 		for(int i = 0; i < 32; i++) {
 			cs[i] = (byte) (xr[0][i] ^ xr[1][i]);
 		} 
+		// anotherCs接受另一方传来的密文
 		byte[] anotherCs = null;
 		synchronized (queue) {
 			queue.add(cs);
@@ -77,6 +93,7 @@ public class Millionaires extends Thread {
 			GT2 = anotherQueue.remove(0);
 			anotherQueue.notify();
 		}
+		// 以下是algorithm 11
 		int[][] GT = new int[32][];
 		boolean flag = false;
 		for(int i = 0; i < 32; i++) {
@@ -104,6 +121,11 @@ public class Millionaires extends Thread {
 		}
 	}
 	
+	/**
+	 * 产生随机数以及num的二进制序列
+	 * @param num 百万富翁拥有的钱
+	 * @return
+	 */
 	public byte[][] init(int num) {
 		Random random = new Random();
 		byte[][] xr = new byte[2][];
@@ -117,6 +139,12 @@ public class Millionaires extends Thread {
 		return xr;
 	}
 	
+	/**
+	 * 对应论文的algorithm 9
+	 * @param cs 另一方传过来的密文
+	 * @param rs 本地保存的随机数
+	 * @return
+	 */
 	public byte[][] SHTP1(byte[] cs, byte[] rs) {
 		// System.out.println("I'm " + this.name + ".I'm using SHTP1");
 		byte[][] GT = new byte[32][];
@@ -127,6 +155,12 @@ public class Millionaires extends Thread {
 		return GT;
 	}
 	
+	/**
+	 * 对应论文的algorithm 10
+	 * @param cs 另一方传过来的密文
+	 * @param rs 本地保存的随机数
+	 * @return
+	 */
 	public byte[][] SHTP2(byte[] cs, byte[] rs) {
 		// System.out.println("I'm " + this.name + ".I'm using SHTP2");
 		byte[][] GT = new byte[32][];
@@ -140,6 +174,13 @@ public class Millionaires extends Thread {
 		return GT;
 	}
 	
+	/**
+	 * 对应algorithm 9和algorithm 10中逻辑相同的部分
+	 * @param GT
+	 * @param cs 另一方传过来的密文
+	 * @param rs 本地保存的随机数
+	 * @param inverse
+	 */
 	public void helper(byte[][] GT, byte[] cs, byte[] rs, boolean inverse) {
 		Random PRNG = new Random(47);
 		int[][] ex = new int[32][];
@@ -212,7 +253,7 @@ public class Millionaires extends Thread {
 	
 	public static void main(String[] args) {
 		Millionaires alice = new Millionaires("Alice", 10);
-		Millionaires bob = new Millionaires("Bob", 12);
+		Millionaires bob = new Millionaires("Bob", 11);
 		alice.start();
 		bob.start();
 	}
