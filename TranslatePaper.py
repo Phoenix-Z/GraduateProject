@@ -4,6 +4,7 @@ import re
 import CopeWithJS
 import win32clipboard
 import sys
+import pythoncom
 
 __author__ = "Pheonix-Z"
 __date__ = "2017/03/01"
@@ -78,7 +79,7 @@ if __name__ == "__main__":
     source = delete_rn(source).decode('gbk')
 
     # 将翻译结果写入文件中
-    with open("output.txt", 'a') as f:
+    with open("C:\\Users\\Phoenix-Z\\Desktop\\test.doc", 'a') as f:
         output = translate(source)
         f.write(output)
         f.write("\r\n")

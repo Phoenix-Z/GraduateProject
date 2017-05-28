@@ -6,6 +6,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 import threading
 
+plt.rcParams['font.sans-serif'] = ['SimHei']
+
 
 def kclusters(rows, k=4):
     # 计算每个属性的取值范围
@@ -55,24 +57,25 @@ def criterion(now, prev):
     return False
 
 
-# a = 5 * np.random.random((10, 2))
-# b = 5 * np.random.random((10, 2)) + 20
-# test_rows = a.tolist() + b.tolist()
-# lastclusters = kclusters(test_rows, 2)
-# x = [row[0] for row in test_rows]
-# y = [row[1] for row in test_rows]
-# plt.scatter(x, y, marker='o', c='r')
-# cx = [cluster[0] for cluster in lastclusters]
-# cy = [cluster[1] for cluster in lastclusters]
-# plt.scatter(cx, cy, marker='o', c='g')
-# plt.show()
-if __name__ == "__main__":
-    response = requests.get("http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data")
-    rows = []
-    for line in response.text.split("\n"):
-        if line:
-            rows.append(map(float, line.split(",")[1:]))
-    last = kclusters(rows, 3)
-    for res in last:
-        print res
+a = 5 * np.random.random((100, 2))
+b = 5 * np.random.random((100, 2)) + 20
+test_rows = a.tolist() + b.tolist()
+lastclusters = kclusters(test_rows, 2)
+x = [row[0] for row in test_rows]
+y = [row[1] for row in test_rows]
+plt.scatter(x, y, marker='o', c='r', s=5, label=u'样本点')
+cx = [cluster[0] for cluster in lastclusters]
+cy = [cluster[1] for cluster in lastclusters]
+plt.scatter(cx, cy, marker='x', c='g', s=20, label=u'聚类中心')
+plt.legend()
+plt.show()
+# if __name__ == "__main__":
+#     response = requests.get("http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data")
+#     rows = []
+#     for line in response.text.split("\n"):
+#         if line:
+#             rows.append(map(float, line.split(",")[1:]))
+#     last = kclusters(rows, 3)
+#     for res in last:
+#         print res
 
