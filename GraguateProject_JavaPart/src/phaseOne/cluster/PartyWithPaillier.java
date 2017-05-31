@@ -34,6 +34,7 @@ public class PartyWithPaillier extends Thread {
 	private int attributes;
 	private int entities;
 	private float[][] centers = null;
+	private Map<Integer, List<Integer>> entityBelongCluster = null;
 
 	/*
 	 * 以下是静态数据，用于线程间通信
@@ -63,7 +64,7 @@ public class PartyWithPaillier extends Thread {
 	static List<BigInteger> tunnel = new ArrayList<>();
 	static List<Integer> now = new ArrayList<>();
 	static List<Integer> done = new ArrayList<>();
-	static Paillier compare = new Paillier(512, 16);
+	static Paillier compare = new Paillier(64, 16);
 	static List<BigInteger> cipher = new ArrayList<>();
 	static int iterateTimes = 0;
 
@@ -103,7 +104,7 @@ public class PartyWithPaillier extends Thread {
 			}
 			//System.out.println("I'm party" + this.id + Arrays.deepToString(centers));
 			// 计算每一个元组与之最近的聚类的聚类编号
-			Map<Integer, List<Integer>> entityBelongCluster = new HashMap<>();
+			entityBelongCluster = new HashMap<>();
 			for (int i = 0; i < entities; i++) {
 				//System.out.println("another run: " + i);
 				int clusterId = closestCluster(i);
@@ -167,7 +168,7 @@ public class PartyWithPaillier extends Thread {
 	}
 
 	public boolean isSatisfyCriteria(float[][] prev, float[][] now) {
-		float threshold = 10e-2f;
+		float threshold = 10e-1f;
 		for (int i = 0; i < prev.length; i++) {
 			for (int j = 0; j < prev[i].length; j++) {
 				if (Math.abs(prev[i][j] - now[i][j]) > threshold)
@@ -450,13 +451,18 @@ public class PartyWithPaillier extends Thread {
 		party2.start();
 		party3.start();
 		party4.start();
-/*		try {
-			sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		System.out.println(Arrays.deepToString(party1.getCenters()));
-		System.out.println(Arrays.deepToString(party2.getCenters()));*/
 	}
-
+	
+	public double getErrors() {
+		float errors = 0.0f;
+		for(Map.Entry<Integer, List<Integer>> entry : entityBelongCluster.entrySet()) {
+			int clusterId = entry.getKey();
+			for(int entityId : entry.getValue()) {
+				for(int i = 0; i < this.attributes; i++) {
+					errors += Math.pow(data[entityId][i] - centers[clusterId][i], 2);
+				}
+			}
+		}
+		return errors;
+	}
 }

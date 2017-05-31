@@ -25,6 +25,8 @@ public class Party extends Thread {
 	 * @param entities 元组的个数
 	 * 
 	 * @param centers k个聚类的聚类中心在各个分布式数据库的属性上的投影
+	 * 
+	 * @param entityBelongCluster 计算每一个元组与之最近的聚类的聚类编号
 	 */
 	private static int databases;
 	private int id;
@@ -33,6 +35,8 @@ public class Party extends Thread {
 	private int attributes;
 	private int entities;
 	private float[][] centers = null;
+	private float threshold = 10e-10f;
+	private Map<Integer, List<Integer>> entityBelongCluster = null;
 
 	/*
 	 * 以下是静态数据，用于线程间通信
@@ -84,6 +88,20 @@ public class Party extends Thread {
 		}
 		databases++;
 	}
+	
+	public Party(int id, int k, float[][] data, float threshold) {
+		this.id = id;
+		this.clusterNum = k;
+		this.data = data;
+		this.entities = data.length;
+		this.attributes = data[0].length;
+		this.threshold = threshold;
+		this.centers = new float[clusterNum][];
+		for (int i = 0; i < clusterNum; i++) {
+			centers[i] = new float[this.attributes];
+		}
+		databases++;
+	}
 
 	@Override
 	public void run() {
@@ -95,8 +113,7 @@ public class Party extends Thread {
 				prev[i] = Arrays.copyOf(centers[i], attributes);
 			}
 			//System.out.println("I'm party" + this.id + Arrays.deepToString(centers));
-			// 计算每一个元组与之最近的聚类的聚类编号
-			Map<Integer, List<Integer>> entityBelongCluster = new HashMap<>();
+			entityBelongCluster = new HashMap<>();
 			for (int i = 0; i < entities; i++) {
 				//System.out.println("another run: " + i);
 				int clusterId = closestCluster(i);
@@ -158,7 +175,6 @@ public class Party extends Thread {
 	}
 
 	public boolean isSatisfyCriteria(float[][] prev, float[][] now) {
-		float threshold = 10e-10f;
 		for (int i = 0; i < prev.length; i++) {
 			for (int j = 0; j < prev[i].length; j++) {
 				if (Math.abs(prev[i][j] - now[i][j]) > threshold)
@@ -415,4 +431,17 @@ public class Party extends Thread {
 		System.out.println(Arrays.deepToString(party2.getCenters()));*/
 	}
 
+	public double getErrors() {
+		float errors = 0.0f;
+		for(Map.Entry<Integer, List<Integer>> entry : entityBelongCluster.entrySet()) {
+			int clusterId = entry.getKey();
+			for(int entityId : entry.getValue()) {
+				for(int i = 0; i < this.attributes; i++) {
+					errors += Math.pow(data[entityId][i] - centers[clusterId][i], 2);
+				}
+			}
+		}
+		return errors;
+	}
+	
 }
