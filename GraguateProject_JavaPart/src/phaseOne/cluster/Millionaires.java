@@ -26,10 +26,16 @@ public class Millionaires extends Thread {
 	private byte[][] GT1, GT2;
 	static private List<byte[]> queue = new LinkedList<>();
 	static private List<byte[][]> anotherQueue = new LinkedList<>();
+	static int aliceNum, bobNum;
+	
  
 	public Millionaires(String name, int num) {
 		this.name = name;
 		this.num = num;
+		if(name == "Alice")
+			aliceNum = num;
+		if(name == "Bob")
+			bobNum = num;
 	}
 	
 	public Millionaires(String name, float num) {
@@ -55,6 +61,7 @@ public class Millionaires extends Thread {
 		// xr的第二行是随机数
 		byte[][] xr = init(num);
 		byte[] cs = new byte[32];
+		boolean flag = aliceNum > bobNum;
 		// 生成异或值
 		for(int i = 0; i < 32; i++) {
 			cs[i] = (byte) (xr[0][i] ^ xr[1][i]);
@@ -95,7 +102,8 @@ public class Millionaires extends Thread {
 		}
 		// 以下是algorithm 11
 		int[][] GT = new int[32][];
-		boolean flag = false;
+		@SuppressWarnings("unused")
+		boolean falg = false;
 		for(int i = 0; i < 32; i++) {
 			GT[i] = new int[lambda];
 			int count = 0;
@@ -106,19 +114,13 @@ public class Millionaires extends Thread {
 				}
 			}
 			if(count == lambda) {
-				flag = true;
+				falg = true;
 				break;
 			}
 		}
 		//System.out.println("I'm " + this.name + ".GT is " + Arrays.deepToString(GT));
 		// System.out.println("I'm " + this.name + "GT1 is: " + Arrays.deepToString(GT1) + "\nGT2 is: " + Arrays.deepToString(GT2));
-		if(this.name.equals("Alice")) {
-			if(!flag) {
-				System.out.println("I'm " + this.name + ". I'm smaller than the other.");
-			} else {
-				System.out.println("I'm " + this.name + ". I'm greater than the other.");
-			}
-		}
+		display(flag);
 	}
 	
 	/**
@@ -137,6 +139,16 @@ public class Millionaires extends Thread {
 			num >>= 1;
 		}
 		return xr;
+	}
+	
+	public void display(boolean flag) {
+		if(this.name.equals("Alice")) {
+			if(!flag) {
+				System.out.println("I'm " + this.name + ". I'm smaller than the other.");
+			} else {
+				System.out.println("I'm " + this.name + ". I'm greater than the other.");
+			}
+		}
 	}
 	
 	/**
@@ -252,7 +264,7 @@ public class Millionaires extends Thread {
 	}
 	
 	public static void main(String[] args) {
-		Millionaires alice = new Millionaires("Alice", 10);
+		Millionaires alice = new Millionaires("Alice", 12);
 		Millionaires bob = new Millionaires("Bob", 11);
 		alice.start();
 		bob.start();
