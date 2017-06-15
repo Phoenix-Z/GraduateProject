@@ -56,7 +56,7 @@ public class Paillier {
 		n = p.multiply(q);
 		squareN = n.pow(2);
 		
-		Random rng = new Random();
+//		Random rng = new Random();
 		lambda = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE))
 				.divide(p.subtract(BigInteger.ONE).gcd(q.subtract(BigInteger.ONE)));
 		g = new BigInteger("2");
@@ -112,7 +112,7 @@ public class Paillier {
 	
 	public static void main(String[] args) {
 		Paillier paillier = new Paillier();
-		BigInteger numA = new BigInteger("300");
+		BigInteger numA = new BigInteger("10");
 		int numB = 20;
 		BigInteger c = paillier.Encryption(numA);
 		Random rnd = new Random();
