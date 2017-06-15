@@ -153,7 +153,7 @@ public class Party extends Thread {
 			iterateTimes++;
 		} while (!isSatisfyCriteria(prev, centers));
 		System.out.println("I'm party" + this.id + ".My centers are " + Arrays.deepToString(centers));
-		System.out.println("iterate times is: " + iterateTimes);
+		//System.out.println("iterate times is: " + iterateTimes);
 	}
 
 	public void init() {
