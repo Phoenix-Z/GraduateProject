@@ -10,9 +10,10 @@ import java.util.Map;
 public class TrustedThirdParty extends Thread {
 
 	public static Map<Integer, List<Integer>> message = new HashMap<>();
+	@SuppressWarnings("rawtypes")
 	private Class testClass;
 
-	public TrustedThirdParty(Class clazz) {
+	public TrustedThirdParty(@SuppressWarnings("rawtypes") Class clazz) {
 		testClass = clazz;
 	}
 	
@@ -50,7 +51,7 @@ public class TrustedThirdParty extends Thread {
 				Database.candidate.clear();
 			}
 		}
-//		 System.out.println(tuples);
+		 System.out.println(tuples);
 		// 如果样本已不再可分(或者已不再有候选属性)，则返回一个叶子节点，叶子对应的属性就是决策变量的值
 		
 		if(isLeaf(tuples)){
@@ -58,6 +59,7 @@ public class TrustedThirdParty extends Thread {
 				return new TreeNode(tuples.get(0).feature);
 			else
 				return new TreeNode();
+//			return new TreeNode(tuples.get(0).feature);
 		}
 	
 		// 对tuples排序，以便找到信息增益最大的属性
