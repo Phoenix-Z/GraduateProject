@@ -1,5 +1,6 @@
 package phaseOne.cluster;
 
+import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -142,7 +143,7 @@ public class PartyWithPaillier extends Thread {
 				recalculateCenters(centers, entry.getKey(), entry.getValue());
 			}
 //			System.out.println("I'm still awake!");
-			if(iterateTimes++ > 15)
+			if(iterateTimes++ > 10)
 				break;
 		} while (!isSatisfyCriteria(prev, centers));
 		System.out.println("I'm party" + this.id + ".My centers are " + Arrays.deepToString(centers));
@@ -168,7 +169,7 @@ public class PartyWithPaillier extends Thread {
 	}
 
 	public boolean isSatisfyCriteria(float[][] prev, float[][] now) {
-		float threshold = 10e-1f;
+		float threshold = 10e-0f;
 		for (int i = 0; i < prev.length; i++) {
 			for (int j = 0; j < prev[i].length; j++) {
 				if (Math.abs(prev[i][j] - now[i][j]) > threshold)
@@ -416,42 +417,6 @@ public class PartyWithPaillier extends Thread {
 		return centers;
 	}
 
-	public static void main(String[] args) {
-		List<float[]> datas = GetData.getData();
-		int length = datas.size();
-		float[][] d1 = new float[length][];
-		float[][] d2 = new float[length][];
-		float[][] d3 = new float[length][];
-		float[][] d4 = new float[length][];
-		for(int i = 0; i < length; i++) {
-			int j = 0;
-			d1[i] = new float[3];
-			for(int k = 0; k < 3; k++) {
-				d1[i][k] = datas.get(i)[j++];
-			}
-			d2[i] = new float[3];
-			for(int k = 0; k < 3; k++) {
-				d2[i][k] = datas.get(i)[j++];
-			}
-			d3[i] = new float[3];
-			for(int k = 0; k < 3; k++) {
-				d3[i][k] = datas.get(i)[j++];
-			}
-			d4[i] = new float[4];
-			for(int k = 0; k < 4; k++) {
-				d4[i][k] = datas.get(i)[j++];
-			}
-		}
-		
-		PartyWithPaillier party1 = new PartyWithPaillier(1, 3, d1);
-		PartyWithPaillier party2 = new PartyWithPaillier(2, 3, d2);
-		PartyWithPaillier party3 = new PartyWithPaillier(3, 3, d3);
-		PartyWithPaillier party4 = new PartyWithPaillier(4, 3, d4);
-		party1.start();
-		party2.start();
-		party3.start();
-		party4.start();
-	}
 	
 	public double getErrors() {
 		float errors = 0.0f;
@@ -465,4 +430,40 @@ public class PartyWithPaillier extends Thread {
 		}
 		return errors;
 	}
+	
+	public static void main(String[] args) throws FileNotFoundException {
+		String dataFilePath = "D:\\PycharmProjects\\GraduateProject\\GraguateProject_JavaPart\\src\\phaseOne\\cluster\\iris-revised.txt";
+		List<float[]> datas = new GetDataFromFile(dataFilePath).getData();
+		int length = datas.size();
+		float[][] d1 = new float[length][];
+		float[][] d2 = new float[length][];
+		for(int i = 0; i < length; i++) {
+//			System.out.println(Arrays.toString(datas.get(i)));
+			int j = 0;
+			d1[i] = new float[2];
+			for(int k = 0; k < 2; k++) {
+				d1[i][k] = datas.get(i)[j++];
+			}
+			d2[i] = new float[2];
+			for(int k = 0; k < 2; k++) {
+				d2[i][k] = datas.get(i)[j++];
+			}
+		}
+		PartyWithPaillier party1 = new PartyWithPaillier(1, 3, d1);
+		PartyWithPaillier party2 = new PartyWithPaillier(2, 3, d2);
+		long startTime = System.currentTimeMillis();
+		party1.start();
+		party2.start();
+		
+		try {
+			party1.join();
+			party2.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		long endTime = System.currentTimeMillis();
+		System.out.println("运行时间：" + (endTime - startTime) * 0.001 + "秒");
+		System.out.println("平方误差为：" + Math.sqrt(party1.getErrors() + party2.getErrors()));
+	}
+
 }
