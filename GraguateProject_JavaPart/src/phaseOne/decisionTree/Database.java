@@ -149,7 +149,7 @@ public class Database extends Thread {
 			group[i] = i;
 		do {
 			Tuple tuple = chooseBestFeature(group);
-//			System.out.println(tuple);
+			System.out.println("I'm database" + this.id + ". I send message: " + tuple);
 			synchronized (candidate) {
 				candidate.put(this.id, tuple);
 				if (candidate.size() == databases)
